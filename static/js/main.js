@@ -239,6 +239,7 @@ $(function() {
 
   function updateConfList() {
     var selectedFilters = getSelectedFiltersFromDOM();
+    var query = $.trim($('#search-input').val()).toLowerCase();
 
     $('.conf').each(function() {
       var conf = $(this);
@@ -262,9 +263,75 @@ $(function() {
         }
       });
 
+      if (show && query) {
+        show = conf.data('searchText').indexOf(query) !== -1;
+      }
+
       conf.toggle(show);
     });
   }
+
+  // Search: highlight matches and auto-expand topics that match
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function escapeRegExp(text) {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  $('.searchable').each(function() {
+    $(this).data('orig', $(this).text());
+  });
+
+  $('.conf').each(function() {
+    var text = [];
+    $(this).find('.searchable').each(function() {
+      text.push($(this).data('orig'));
+    });
+    $(this).data('searchText', text.join(' ').toLowerCase());
+  });
+
+  function highlightSearch() {
+    var query = $.trim($('#search-input').val());
+    var re = query ? new RegExp('(' + escapeRegExp(query) + ')', 'ig') : null;
+
+    $('.searchable').each(function() {
+      var el = $(this);
+      var orig = el.data('orig');
+      if (!re) {
+        el.text(orig);
+        return;
+      }
+      // odd-indexed parts are the captured matches
+      var html = orig.split(re).map(function(part, i) {
+        return i % 2 ? '<mark>' + escapeHtml(part) + '</mark>' : escapeHtml(part);
+      }).join('');
+      el.html(html);
+    });
+
+    $('.topics').each(function() {
+      var topics = $(this);
+      var matched = re && topics.find('.topics-list mark').length > 0;
+      if (matched) {
+        topics.addClass('open search-open');
+      } else if (topics.hasClass('search-open')) {
+        topics.removeClass('open search-open');
+      }
+    });
+  }
+
+  $('.topics-toggle').on('click', function(e) {
+    e.preventDefault();
+    $(this).closest('.topics').toggleClass('open').removeClass('search-open');
+  });
+
+  $('#search-input').on('input', function() {
+    highlightSearch();
+    updateConfList();
+  });
 
   $('.filter-checkbox').on('change', function() {
     saveSelectedTags();

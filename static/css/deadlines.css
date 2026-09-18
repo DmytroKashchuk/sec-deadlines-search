@@ -94,6 +94,40 @@ a:hover, a:focus {
   margin-right: 1em;
 }
 
+#search-input {
+  margin-top: 0.5em;
+}
+
+.topics-toggle {
+  border-bottom: none;
+  color: #777;
+  font-size: 0.9em;
+}
+
+.topics-toggle::before {
+  content: "▸ ";
+}
+
+.topics.open .topics-toggle::before {
+  content: "▾ ";
+}
+
+.topics-list {
+  display: none;
+  margin-top: 0.25em;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.topics.open .topics-list {
+  display: block;
+}
+
+mark {
+  padding: 0;
+  background-color: #fff3b0;
+}
+
 footer {
   margin-bottom: 2em;
 }

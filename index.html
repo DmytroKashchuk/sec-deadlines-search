@@ -84,6 +84,11 @@
             </form>
           </div>
         </div>
+        <div class="row">
+          <div class="col-xs-12 col-sm-6">
+            <input type="search" id="search-input" class="form-control" placeholder="Search by name, topic, place…" autocomplete="off">
+          </div>
+        </div>
       </div>
       <div class="conf-container">
         {% for conf in site.data.conferences %}
@@ -97,13 +102,19 @@
         <div id="{{ conf_id }}" class="conf {% for tag in conf.tags %} {{tag}} {% endfor %}">
           <div class="row">
               <div class="col-xs-12 col-sm-6">
-                <h2><a href="{{conf.link}}">{{conf.name}} {{conf.year}}</a></h2>
+                <h2><a href="{{conf.link}}"><span class="searchable">{{conf.name}} {{conf.year}}</span></a></h2>
                 <div class="meta">
-                  {{ conf.description }}<br />
+                  <span class="searchable">{{ conf.description }}</span><br />
                   {% if conf.dblp %}
                   <a href="{{conf.dblp}}">DBLP</a><br />
                   {% endif %}
-                  {{conf.date | replace: '-', '–'}} {% if conf.place %}// <a href="http://maps.google.com/?q={{conf.place}}">{{conf.place}}</a>{% endif %}<br />
+                  {{conf.date | replace: '-', '–'}} {% if conf.place %}// <a href="http://maps.google.com/?q={{conf.place}}"><span class="searchable">{{conf.place}}</span></a>{% endif %}<br />
+                  {% if conf.topics and conf.topics.size > 0 %}
+                  <div class="topics">
+                    <a href="#" class="topics-toggle">Topics</a>
+                    <div class="topics-list searchable">{{ conf.topics | join: ", " }}</div>
+                  </div>
+                  {% endif %}
                 </div>
               </div>
               <div class="col-xs-12 col-sm-6">
